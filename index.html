@@ -1,214 +1,398 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+  >
+  <title>歴史パズル</title>
+  <meta name="theme-color" content="#ff85a1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="歴史パズル">
+  <meta name="description" content="歴史時代を正しい順番に並べるスマホ向け学習パズルです。">
 
-    <title>歴史パズル</title>
-    <meta name="theme-color" content="#ff85a1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="歴史パズル">
-    <meta name="description" content="歴史時代を正しい順番に並べる学習パズルです。">
+  <style>
+    :root {
+      --bg1: #fff5f5;
+      --bg2: #fffafc;
+      --card: #ffffff;
+      --main: #d63384;
+      --sub: #666;
+      --accent: #ff85a1;
+      --accent2: #fd7e14;
+      --line: #ffd6e0;
+      --soft: #fff0f6;
+      --ok: #28a745;
+      --ng: #ef4444;
+      --shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
 
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-    <style>
-        body {
-            font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
-            background: linear-gradient(180deg, #fff5f5 0%, #fffafc 100%);
-            text-align: center;
-            padding: 10px;
-            margin: 0;
-            touch-action: manipulation;
-        }
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
+        "Yu Gothic", sans-serif;
+      color: #333;
+    }
 
-        h1 {
-            color: #d63384;
-            font-size: 1.3rem;
-            margin: 10px 0;
-        }
+    body {
+      text-align: center;
+      padding:
+        calc(14px + var(--safe-top))
+        12px
+        calc(16px + var(--safe-bottom));
+      touch-action: manipulation;
+    }
 
-        .hint {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 10px;
-        }
+    .app-shell {
+      max-width: 420px;
+      margin: 0 auto;
+    }
 
-        #puzzle-container {
-            max-width: 360px;
-            margin: 16px auto;
-            background: white;
-            padding: 14px;
-            border-radius: 24px;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.08);
-            border: 2px solid #ffd6e0;
-        }
+    .app-header {
+      margin-bottom: 12px;
+    }
 
-        .era-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+    .app-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      color: #c2255c;
+      background: #ffe3ec;
+      padding: 6px 10px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
 
-        .era-item {
-            background: #fff;
-            margin: 8px 0;
-            padding: 14px 12px;
-            border-radius: 14px;
-            border: 2px solid #ffecf2;
-            font-weight: bold;
-            color: #d63384;
-            cursor: move;
-            transition: all 0.2s;
-            position: relative;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            user-select: none;
-            -webkit-user-select: none;
-        }
+    h1 {
+      margin: 6px 0 6px;
+      color: var(--main);
+      font-size: 1.45rem;
+      line-height: 1.3;
+    }
 
-        .era-item.dragging {
-            opacity: 0.5;
-            background: #ffe3e3;
-            border-color: #ff85a1;
-            transform: scale(1.03);
-        }
+    .hint {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--sub);
+      line-height: 1.6;
+    }
 
-        .btn-check,
-        .btn-reset {
-            border: none;
-            padding: 14px 24px;
-            border-radius: 30px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 12px;
-            width: 80%;
-        }
+    #puzzle-container {
+      background: var(--card);
+      border: 2px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+      margin-top: 16px;
+    }
 
-        .btn-check {
-            background: linear-gradient(135deg, #ff85a1, #fd7e14);
-            color: white;
-            box-shadow: 0 4px 15px rgba(253, 126, 20, 0.25);
-        }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
 
-        .btn-reset {
-            background: #fff0f6;
-            color: #d63384;
-            border: 2px solid #ffd6e0;
-        }
+    .mini-chip {
+      background: var(--soft);
+      color: var(--main);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
 
-        #result {
-            margin-top: 15px;
-            font-weight: bold;
-            font-size: 1.05rem;
-            min-height: 1.5em;
-            line-height: 1.6;
-        }
+    .era-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
 
-        .correct {
-            color: #28a745;
-            animation: celebrate 0.5s ease infinite alternate;
-        }
+    .era-item {
+      background: #fff;
+      margin: 8px 0;
+      padding: 14px 12px;
+      border-radius: 14px;
+      border: 2px solid #ffecf2;
+      font-weight: 700;
+      color: var(--main);
+      cursor: move;
+      transition: transform 0.18s ease, opacity 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      user-select: none;
+      -webkit-user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 52px;
+    }
 
-        @keyframes celebrate {
-            from { transform: scale(1); }
-            to { transform: scale(1.05); }
-        }
+    .era-item::after {
+      content: "☰";
+      font-size: 0.95rem;
+      color: #f06595;
+      opacity: 0.75;
+      flex-shrink: 0;
+    }
 
-        .app-badge {
-            display: inline-block;
-            margin-top: 4px;
-            margin-bottom: 10px;
-            font-size: 0.72rem;
-            background: #ffe3ec;
-            color: #c2255c;
-            padding: 5px 10px;
-            border-radius: 999px;
-        }
-    </style>
+    .era-item.dragging {
+      opacity: 0.55;
+      background: #ffe3e3;
+      border-color: var(--accent);
+      transform: scale(1.02);
+    }
+
+    .button-group {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      appearance: none;
+      -webkit-appearance: none;
+      border: none;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 14px 20px;
+      width: min(100%, 320px);
+      cursor: pointer;
+    }
+
+    .btn-check {
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 6px 18px rgba(253, 126, 20, 0.22);
+    }
+
+    .btn-reset {
+      background: var(--soft);
+      color: var(--main);
+      border: 2px solid var(--line);
+    }
+
+    .btn-check:active,
+    .btn-reset:active {
+      transform: scale(0.98);
+    }
+
+    #result {
+      margin-top: 15px;
+      min-height: 3.2em;
+      font-weight: 700;
+      font-size: 1.02rem;
+      line-height: 1.65;
+      padding: 4px 6px;
+    }
+
+    .correct {
+      color: var(--ok);
+      animation: celebrate 0.45s ease infinite alternate;
+    }
+
+    .wrong {
+      color: var(--ng);
+    }
+
+    .footer-note {
+      margin-top: 12px;
+      font-size: 0.76rem;
+      color: #777;
+      line-height: 1.6;
+    }
+
+    @keyframes celebrate {
+      from { transform: scale(1); }
+      to { transform: scale(1.04); }
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding-top: 22px;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      #puzzle-container {
+        padding: 18px;
+      }
+    }
+  </style>
 </head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="app-badge">ホーム画面に追加すると使いやすいです</div>
+      <h1>🌸 歴史パズル 🌸</h1>
+      <p class="hint">指でつかんで、正しい順番に並べてください。</p>
+    </header>
 
-    <h1>🌸 歴史時代パズル 🌸</h1>
-    <p class="hint">指でつかんで、正しい順番に並べてね！</p>
+    <main id="puzzle-container">
+      <div class="top-bar">
+        <div class="mini-chip">全部で 18 個</div>
+        <div class="mini-chip" id="status-chip">がんばって並べよう</div>
+      </div>
 
-    <div id="puzzle-container">
-        <ul class="era-list" id="era-list"></ul>
+      <ul class="era-list" id="era-list"></ul>
+
+      <div class="button-group">
         <button class="btn-check" onclick="checkAnswer()">できた！</button>
-        <div id="result"></div>
-    </div>
+        <button class="btn-reset" onclick="resetPuzzle()">もう一回あそぶ</button>
+      </div>
 
-    <script>
-        const correctOrder = ["旧石器", "縄文", "弥生", "古墳", "飛鳥", "奈良", "平安", "鎌倉", "南北朝", "室町", "戦国", "安土桃山", "江戸", "明治", "大正", "昭和", "平成", "令和"];
-        const listElement = document.getElementById('era-list');
-        
-        let currentEras = [...correctOrder].sort(() => Math.random() - 0.5);
+      <div id="result"></div>
 
-        function init() {
-            render();
-            listElement.addEventListener('dragstart', e => { if(e.target.classList.contains('era-item')) e.target.classList.add('dragging'); });
-            listElement.addEventListener('dragend', e => { if(e.target.classList.contains('era-item')) e.target.classList.remove('dragging'); });
-            listElement.addEventListener('dragover', e => {
-                e.preventDefault();
-                const draggingItem = document.querySelector('.dragging');
-                const siblings = [...listElement.querySelectorAll('.era-item:not(.dragging)')];
-                let nextSibling = siblings.find(sibling => e.clientY <= sibling.offsetTop + sibling.offsetHeight / 2);
-                listElement.insertBefore(draggingItem, nextSibling);
-            });
+      <div class="footer-note">
+        旧石器から令和まで、流れで覚えるとスッと並べやすいです。
+      </div>
+    </main>
+  </div>
 
-            listElement.addEventListener('touchstart', handleTouch, {passive: false});
-            listElement.addEventListener('touchmove', handleTouch, {passive: false});
-            listElement.addEventListener('touchend', handleTouch, {passive: false});
+  <script>
+    const correctOrder = [
+      "旧石器", "縄文", "弥生", "古墳", "飛鳥", "奈良", "平安",
+      "鎌倉", "南北朝", "室町", "戦国", "安土桃山", "江戸",
+      "明治", "大正", "昭和", "平成", "令和"
+    ];
+
+    const listElement = document.getElementById("era-list");
+    const resultElement = document.getElementById("result");
+    const statusChip = document.getElementById("status-chip");
+
+    let currentEras = [];
+    let touchItem = null;
+
+    function shuffleArray(array) {
+      return [...array].sort(() => Math.random() - 0.5);
+    }
+
+    function render() {
+      listElement.innerHTML = "";
+      currentEras.forEach((era) => {
+        const li = document.createElement("li");
+        li.className = "era-item";
+        li.draggable = true;
+        li.textContent = era;
+        listElement.appendChild(li);
+      });
+      updateStatus("がんばって並べよう");
+    }
+
+    function resetPuzzle() {
+      currentEras = shuffleArray(correctOrder);
+      render();
+      resultElement.innerHTML = "";
+      resultElement.className = "";
+    }
+
+    function updateStatus(text) {
+      statusChip.textContent = text;
+    }
+
+    function checkAnswer() {
+      const items = [...listElement.querySelectorAll(".era-item")];
+      const userOrder = items.map((item) => item.firstChild.textContent || item.textContent.replace("☰", "").trim());
+      const isCorrect = JSON.stringify(userOrder) === JSON.stringify(correctOrder);
+
+      if (isCorrect) {
+        resultElement.innerHTML = "🎉 すごい！全問正解です！<br>これで歴史マスターですね。";
+        resultElement.className = "correct";
+        updateStatus("全問正解！");
+      } else {
+        resultElement.innerHTML = "おっと、どこか違うようです。<br>もう一回並べ直してみましょう。";
+        resultElement.className = "wrong";
+        updateStatus("もう少し！");
+      }
+    }
+
+    function getDragAfterElement(container, y) {
+      const draggableElements = [
+        ...container.querySelectorAll(".era-item:not(.dragging)")
+      ];
+
+      return draggableElements.find((child) => {
+        const box = child.getBoundingClientRect();
+        return y <= box.top + box.height / 2;
+      });
+    }
+
+    function handleTouch(e) {
+      if (e.type === "touchstart") {
+        touchItem = e.target.closest(".era-item");
+        if (touchItem) {
+          touchItem.classList.add("dragging");
         }
+      } else if (e.type === "touchmove") {
+        if (!touchItem) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
 
-        function render() {
-            listElement.innerHTML = '';
-            currentEras.forEach(era => {
-                const li = document.createElement('li');
-                li.className = 'era-item';
-                li.draggable = true;
-                li.textContent = era;
-                listElement.appendChild(li);
-            });
+        if (target && target.classList.contains("era-item") && target !== touchItem) {
+          const rect = target.getBoundingClientRect();
+          const isAfter = (touch.clientY - rect.top) / rect.height > 0.5;
+          listElement.insertBefore(touchItem, isAfter ? target.nextSibling : target);
         }
-
-        let touchItem = null;
-        function handleTouch(e) {
-            if (e.type === 'touchstart') {
-                touchItem = e.target.closest('.era-item');
-                if(touchItem) touchItem.classList.add('dragging');
-            } else if (e.type === 'touchmove') {
-                e.preventDefault();
-                const touch = e.touches[0];
-                const target = document.elementFromPoint(touch.clientX, touch.clientY);
-                const container = listElement;
-                if (target && target.classList.contains('era-item') && target !== touchItem) {
-                    const rect = target.getBoundingClientRect();
-                    const next = (touch.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
-                    container.insertBefore(touchItem, next ? target.nextSibling : target);
-                }
-            } else if (e.type === 'touchend') {
-                if(touchItem) touchItem.classList.remove('dragging');
-                touchItem = null;
-            }
+      } else if (e.type === "touchend" || e.type === "touchcancel") {
+        if (touchItem) {
+          touchItem.classList.remove("dragging");
         }
+        touchItem = null;
+      }
+    }
 
-        function checkAnswer() {
-            const items = [...listElement.querySelectorAll('.era-item')];
-            const userOrder = items.map(item => item.textContent);
-            const isCorrect = JSON.stringify(userOrder) === JSON.stringify(correctOrder);
-            const resDiv = document.getElementById('result');
-            if (isCorrect) {
-                resDiv.innerHTML = "🎉 すごい！全問正解だよ！ 🎉<br>これで歴史マスターだね！";
-                resDiv.className = "correct";
-            } else {
-                resDiv.innerHTML = "おっと、どこか違うみたい！<br>もう一回並べ直してみよう。";
-                resDiv.style.color = "#ef4444";
-            }
-        }
+    function init() {
+      resetPuzzle();
 
-        init();
-    </script>
+      listElement.addEventListener("dragstart", (e) => {
+        const item = e.target.closest(".era-item");
+        if (!item) return;
+        item.classList.add("dragging");
+      });
+
+      listElement.addEventListener("dragend", (e) => {
+        const item = e.target.closest(".era-item");
+        if (!item) return;
+        item.classList.remove("dragging");
+      });
+
+      listElement.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        const draggingItem = document.querySelector(".dragging");
+        if (!draggingItem) return;
+        const afterElement = getDragAfterElement(listElement, e.clientY);
+        listElement.insertBefore(draggingItem, afterElement || null);
+      });
+
+      listElement.addEventListener("touchstart", handleTouch, { passive: false });
+      listElement.addEventListener("touchmove", handleTouch, { passive: false });
+      listElement.addEventListener("touchend", handleTouch, { passive: false });
+      listElement.addEventListener("touchcancel", handleTouch, { passive: false });
+    }
+
+    init();
+  </script>
 </body>
 </html>
