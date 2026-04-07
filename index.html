@@ -25,7 +25,11 @@
       --line: #ffd6e0;
       --soft: #fff0f6;
       --ok: #28a745;
+      --ok-bg: #e9f9ee;
+      --ok-line: #8ce0a4;
       --ng: #ef4444;
+      --ng-bg: #fff1f1;
+      --ng-line: #ffb3b3;
       --shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -159,6 +163,30 @@
       transform: scale(1.02);
     }
 
+    .era-item.correct-place {
+      background: var(--ok-bg);
+      border-color: var(--ok-line);
+      color: #1f7a36;
+    }
+
+    .era-item.correct-place::after {
+      content: "○";
+      color: var(--ok);
+      font-weight: 900;
+    }
+
+    .era-item.wrong-place {
+      background: var(--ng-bg);
+      border-color: var(--ng-line);
+      color: #c92a2a;
+    }
+
+    .era-item.wrong-place::after {
+      content: "×";
+      color: var(--ng);
+      font-weight: 900;
+    }
+
     .button-group {
       margin-top: 14px;
       display: flex;
@@ -265,7 +293,7 @@
       <div id="result"></div>
 
       <div class="footer-note">
-        旧石器から令和まで、流れで覚えるとスッと並べやすいです。
+        ○は正しい位置、×は違う位置です。
       </div>
     </main>
   </div>
@@ -286,6 +314,13 @@
 
     function shuffleArray(array) {
       return [...array].sort(() => Math.random() - 0.5);
+    }
+
+    function clearMarking() {
+      const items = [...listElement.querySelectorAll(".era-item")];
+      items.forEach(item => {
+        item.classList.remove("correct-place", "wrong-place");
+      });
     }
 
     function render() {
@@ -313,17 +348,31 @@
 
     function checkAnswer() {
       const items = [...listElement.querySelectorAll(".era-item")];
-      const userOrder = items.map((item) => item.firstChild.textContent || item.textContent.replace("☰", "").trim());
-      const isCorrect = JSON.stringify(userOrder) === JSON.stringify(correctOrder);
+      const userOrder = items.map((item) => item.textContent.trim());
+
+      clearMarking();
+
+      let correctCount = 0;
+
+      items.forEach((item, index) => {
+        if (userOrder[index] === correctOrder[index]) {
+          item.classList.add("correct-place");
+          correctCount++;
+        } else {
+          item.classList.add("wrong-place");
+        }
+      });
+
+      const isCorrect = correctCount === correctOrder.length;
 
       if (isCorrect) {
         resultElement.innerHTML = "🎉 すごい！全問正解です！<br>これで歴史マスターですね。";
         resultElement.className = "correct";
         updateStatus("全問正解！");
       } else {
-        resultElement.innerHTML = "おっと、どこか違うようです。<br>もう一回並べ直してみましょう。";
+        resultElement.innerHTML = "今の正解数は " + correctCount + " / " + correctOrder.length + " です。<br>赤いところを見直してみましょう。";
         resultElement.className = "wrong";
-        updateStatus("もう少し！");
+        updateStatus(correctCount + "個正解");
       }
     }
 
