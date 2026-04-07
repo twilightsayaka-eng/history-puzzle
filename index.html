@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>歴史時代並び替えパズル</title>
+    <style>
+        body { font-family: 'Hiragino Kaku Gothic ProN', sans-serif; background-color: #fff5f5; text-align: center; padding: 10px; margin: 0; touch-action: manipulation; }
+        h1 { color: #d63384; font-size: 1.2rem; margin: 10px 0; }
+        .hint { font-size: 0.8rem; color: #666; margin-bottom: 10px; }
+        #puzzle-container { max-width: 360px; margin: 0 auto; background: white; padding: 10px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 2px solid #ffc9c9; }
+        .era-list { list-style: none; padding: 0; margin: 0; }
+        .era-item { 
+            background: #fff; margin: 6px 0; padding: 12px; border-radius: 12px; 
+            border: 2px solid #ffecf2; font-weight: bold; color: #d63384;
+            cursor: move; transition: all 0.2s; position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .era-item.dragging { opacity: 0.5; background: #ffe3e3; border-color: #ff85a1; transform: scale(1.05); }
+        .btn-check { 
+            background: linear-gradient(135deg, #ff85a1, #fd7e14); color: white; border: none; 
+            padding: 15px 40px; border-radius: 30px; font-size: 1.1rem; font-weight: bold;
+            cursor: pointer; margin-top: 15px; width: 80%; box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3);
+        }
+        #result { margin-top: 15px; font-weight: bold; font-size: 1.1rem; min-height: 1.5em; }
+        .correct { color: #28a745; animation: celebrate 0.5s ease infinite alternate; }
+        @keyframes celebrate { from { transform: scale(1); } to { transform: scale(1.1); } }
+    </style>
+</head>
+<body>
+
+    <h1>🌸 歴史時代パズル 🌸</h1>
+    <p class="hint">指でつかんで、正しい順番に並べてね！</p>
+
+    <div id="puzzle-container">
+        <ul class="era-list" id="era-list"></ul>
+        <button class="btn-check" onclick="checkAnswer()">できた！</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const correctOrder = ["旧石器", "縄文", "弥生", "古墳", "飛鳥", "奈良", "平安", "鎌倉", "南北朝", "室町", "戦国", "安土桃山", "江戸", "明治", "大正", "昭和", "平成", "令和"];
+        const listElement = document.getElementById('era-list');
+        
+        let currentEras = [...correctOrder].sort(() => Math.random() - 0.5);
+
+        function init() {
+            render();
+            listElement.addEventListener('dragstart', e => { if(e.target.classList.contains('era-item')) e.target.classList.add('dragging'); });
+            listElement.addEventListener('dragend', e => { if(e.target.classList.contains('era-item')) e.target.classList.remove('dragging'); });
+            listElement.addEventListener('dragover', e => {
+                e.preventDefault();
+                const draggingItem = document.querySelector('.dragging');
+                const siblings = [...listElement.querySelectorAll('.era-item:not(.dragging)')];
+                let nextSibling = siblings.find(sibling => e.clientY <= sibling.offsetTop + sibling.offsetHeight / 2);
+                listElement.insertBefore(draggingItem, nextSibling);
+            });
+
+            listElement.addEventListener('touchstart', handleTouch, {passive: false});
+            listElement.addEventListener('touchmove', handleTouch, {passive: false});
+            listElement.addEventListener('touchend', handleTouch, {passive: false});
+        }
+
+        function render() {
+            listElement.innerHTML = '';
+            currentEras.forEach(era => {
+                const li = document.createElement('li');
+                li.className = 'era-item';
+                li.draggable = true;
+                li.textContent = era;
+                listElement.appendChild(li);
+            });
+        }
+
+        let touchItem = null;
+        function handleTouch(e) {
+            if (e.type === 'touchstart') {
+                touchItem = e.target.closest('.era-item');
+                if(touchItem) touchItem.classList.add('dragging');
+            } else if (e.type === 'touchmove') {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const target = document.elementFromPoint(touch.clientX, touch.clientY);
+                const container = listElement;
+                if (target && target.classList.contains('era-item') && target !== touchItem) {
+                    const rect = target.getBoundingClientRect();
+                    const next = (touch.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+                    container.insertBefore(touchItem, next ? target.nextSibling : target);
+                }
+            } else if (e.type === 'touchend') {
+                if(touchItem) touchItem.classList.remove('dragging');
+                touchItem = null;
+            }
+        }
+
+        function checkAnswer() {
+            const items = [...listElement.querySelectorAll('.era-item')];
+            const userOrder = items.map(item => item.textContent);
+            const isCorrect = JSON.stringify(userOrder) === JSON.stringify(correctOrder);
+            const resDiv = document.getElementById('result');
+            if (isCorrect) {
+                resDiv.innerHTML = "🎉 すごい！全問正解だよ！ 🎉<br>これで歴史マスターだね！";
+                resDiv.className = "correct";
+            } else {
+                resDiv.innerHTML = "おっと、どこか違うみたい！<br>もう一回並べ直してみよう。";
+                resDiv.style.color = "#ef4444";
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
