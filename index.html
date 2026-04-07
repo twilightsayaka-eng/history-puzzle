@@ -3,31 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>歴史時代並び替えパズル</title>
+
+    <title>歴史パズル</title>
+    <meta name="theme-color" content="#ff85a1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="歴史パズル">
+    <meta name="description" content="歴史時代を正しい順番に並べる学習パズルです。">
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
     <style>
-        body { font-family: 'Hiragino Kaku Gothic ProN', sans-serif; background-color: #fff5f5; text-align: center; padding: 10px; margin: 0; touch-action: manipulation; }
-        h1 { color: #d63384; font-size: 1.2rem; margin: 10px 0; }
-        .hint { font-size: 0.8rem; color: #666; margin-bottom: 10px; }
-        #puzzle-container { max-width: 360px; margin: 0 auto; background: white; padding: 10px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 2px solid #ffc9c9; }
-        .era-list { list-style: none; padding: 0; margin: 0; }
-        .era-item { 
-            background: #fff; margin: 6px 0; padding: 12px; border-radius: 12px; 
-            border: 2px solid #ffecf2; font-weight: bold; color: #d63384;
-            cursor: move; transition: all 0.2s; position: relative;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        body {
+            font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+            background: linear-gradient(180deg, #fff5f5 0%, #fffafc 100%);
+            text-align: center;
+            padding: 10px;
+            margin: 0;
+            touch-action: manipulation;
         }
-        .era-item.dragging { opacity: 0.5; background: #ffe3e3; border-color: #ff85a1; transform: scale(1.05); }
-        .btn-check { 
-            background: linear-gradient(135deg, #ff85a1, #fd7e14); color: white; border: none; 
-            padding: 15px 40px; border-radius: 30px; font-size: 1.1rem; font-weight: bold;
-            cursor: pointer; margin-top: 15px; width: 80%; box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3);
+
+        h1 {
+            color: #d63384;
+            font-size: 1.3rem;
+            margin: 10px 0;
         }
-        #result { margin-top: 15px; font-weight: bold; font-size: 1.1rem; min-height: 1.5em; }
-        .correct { color: #28a745; animation: celebrate 0.5s ease infinite alternate; }
-        @keyframes celebrate { from { transform: scale(1); } to { transform: scale(1.1); } }
+
+        .hint {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        #puzzle-container {
+            max-width: 360px;
+            margin: 16px auto;
+            background: white;
+            padding: 14px;
+            border-radius: 24px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+            border: 2px solid #ffd6e0;
+        }
+
+        .era-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .era-item {
+            background: #fff;
+            margin: 8px 0;
+            padding: 14px 12px;
+            border-radius: 14px;
+            border: 2px solid #ffecf2;
+            font-weight: bold;
+            color: #d63384;
+            cursor: move;
+            transition: all 0.2s;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .era-item.dragging {
+            opacity: 0.5;
+            background: #ffe3e3;
+            border-color: #ff85a1;
+            transform: scale(1.03);
+        }
+
+        .btn-check,
+        .btn-reset {
+            border: none;
+            padding: 14px 24px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 12px;
+            width: 80%;
+        }
+
+        .btn-check {
+            background: linear-gradient(135deg, #ff85a1, #fd7e14);
+            color: white;
+            box-shadow: 0 4px 15px rgba(253, 126, 20, 0.25);
+        }
+
+        .btn-reset {
+            background: #fff0f6;
+            color: #d63384;
+            border: 2px solid #ffd6e0;
+        }
+
+        #result {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.05rem;
+            min-height: 1.5em;
+            line-height: 1.6;
+        }
+
+        .correct {
+            color: #28a745;
+            animation: celebrate 0.5s ease infinite alternate;
+        }
+
+        @keyframes celebrate {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+
+        .app-badge {
+            display: inline-block;
+            margin-top: 4px;
+            margin-bottom: 10px;
+            font-size: 0.72rem;
+            background: #ffe3ec;
+            color: #c2255c;
+            padding: 5px 10px;
+            border-radius: 999px;
+        }
     </style>
 </head>
-<body>
 
     <h1>🌸 歴史時代パズル 🌸</h1>
     <p class="hint">指でつかんで、正しい順番に並べてね！</p>
